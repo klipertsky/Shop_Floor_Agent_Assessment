@@ -1,5 +1,3 @@
-# Shop_Floor_Agent_Assessment
-
 # 🏭 Shop-Floor AI Agent — ABC Cabinet
 
 An AI-powered shop-floor assistant built with **n8n** to help operators identify panels, verify workstation compatibility, retrieve approved SOP instructions, record production events, and escalate issues to a supervisor when information cannot be safely verified.
