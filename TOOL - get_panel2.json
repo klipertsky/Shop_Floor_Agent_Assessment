@@ -1,0 +1,64 @@
+{
+  "name": "TOOL - get_panel2",
+  "nodes": [
+    {
+      "parameters": {
+        "workflowInputs": {
+          "values": [
+            {
+              "name": "panel_code"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        -480,
+        -128
+      ],
+      "id": "ff62903f-d630-4b62-885f-c2c3292351be",
+      "name": "When Executed by Another Workflow"
+    },
+    {
+      "parameters": {
+        "jsCode": "const panels = {\n  \"P-1001\": {\n    panel_code: \"P-1001\",\n    cabinet_id: \"CAB-001\",\n    panel_name: \"Left Side Panel\",\n    dimensions: {\n      length_mm: 720,\n      width_mm: 450,\n      thickness_mm: 18\n    },\n    material: \"MDF\",\n    required_operation: \"Edge Banding\"\n  },\n\n  \"P-1002\": {\n    panel_code: \"P-1002\",\n    cabinet_id: \"CAB-002\",\n    panel_name: \"Door Panel\",\n    dimensions: {\n      length_mm: 700,\n      width_mm: 400,\n      thickness_mm: 18\n    },\n    material: \"Plywood\",\n    required_operation: \"Drilling\"\n  },\n\n  \"P-1003\": {\n    panel_code: \"P-1003\",\n    cabinet_id: \"CAB-003\",\n    panel_name: \"Right Side Panel\",\n    dimensions: {\n      length_mm: 720,\n      width_mm: 450,\n      thickness_mm: 18\n    },\n    material: \"MDF\",\n    required_operation: \"Edge Banding\"\n  }\n};\n\nconst panelCode = $json.panel_code;\nconst panel = panels[panelCode];\n\nif (!panel) {\n  return [{\n    json: {\n      found: false,\n      panel_code: panelCode,\n      source: \"Panel Database\"\n    }\n  }];\n}\n\nreturn [{\n  json: {\n    found: true,\n    panel,\n    source: `Panel ${panelCode}`\n  }\n}];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -224,
+        -112
+      ],
+      "id": "d30dfcec-8a68-4731-b9f8-83f492769fa4",
+      "name": "Code in JavaScript"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "When Executed by Another Workflow": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "418387ed-13fa-44d2-8983-8b4358a2e3ca",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "fc83b405efa60acbfa280b1c9905f167d082e0ac08dbca43c68e3200d62fce33"
+  },
+  "nodeGroups": [],
+  "id": "98J5HKfYteovh3Pi",
+  "tags": []
+}

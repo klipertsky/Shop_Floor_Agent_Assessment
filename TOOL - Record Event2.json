@@ -1,0 +1,163 @@
+{
+  "name": "TOOL - Record Event2",
+  "nodes": [
+    {
+      "parameters": {
+        "workflowInputs": {
+          "values": [
+            {
+              "name": "Event Type"
+            },
+            {
+              "name": "Panel Code"
+            },
+            {
+              "name": "Workstation Id"
+            },
+            {
+              "name": "Details"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        -352,
+        -96
+      ],
+      "id": "fbfeaef3-96ca-43e9-b2ca-847dcade0655",
+      "name": "When Executed by Another Workflow"
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "1jlVeFyQe5wTgI6ClWftnt6NPzrOox30MFll4U1tE4wU",
+          "mode": "list",
+          "cachedResultName": "Copy of ABC Cabinet Production Data",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1jlVeFyQe5wTgI6ClWftnt6NPzrOox30MFll4U1tE4wU/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 1684881703,
+          "mode": "list",
+          "cachedResultName": "Events",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1jlVeFyQe5wTgI6ClWftnt6NPzrOox30MFll4U1tE4wU/edit#gid=1684881703"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Event Type": "={{ $json['Event Type'] }}",
+            "Panel Code": "={{ $json['Panel Code'] }}",
+            "Details": "={{ $json.Details }}",
+            "Workstation ID": "={{ $json['Workstation Id'] }}",
+            "Timestamp": "={{ $now }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "Timestamp",
+              "displayName": "Timestamp",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Event Type",
+              "displayName": "Event Type",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Panel Code",
+              "displayName": "Panel Code",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Workstation ID",
+              "displayName": "Workstation ID",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Question",
+              "displayName": "Question",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Details",
+              "displayName": "Details",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        -128,
+        -96
+      ],
+      "id": "862321cd-7739-46ce-a8db-72c9eb120b1e",
+      "name": "Append row in sheet",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "B9kLWCRiWs0ouamt",
+          "name": "Google Sheets account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "When Executed by Another Workflow": {
+      "main": [
+        [
+          {
+            "node": "Append row in sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "ae8aac8f-8470-4bcf-a58e-69ac50349c99",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "fc83b405efa60acbfa280b1c9905f167d082e0ac08dbca43c68e3200d62fce33"
+  },
+  "nodeGroups": [],
+  "id": "Uq0qz1pjYQr4DNtF",
+  "tags": []
+}

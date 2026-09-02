@@ -1,0 +1,161 @@
+{
+  "name": "TOOL - Escalate Supervisor2",
+  "nodes": [
+    {
+      "parameters": {
+        "workflowInputs": {
+          "values": [
+            {
+              "name": "reason"
+            },
+            {
+              "name": "Panel Code"
+            },
+            {
+              "name": "Workstation Id"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        -128,
+        -96
+      ],
+      "id": "868cfd80-1920-4004-b271-82bf09da8af4",
+      "name": "When Executed by Another Workflow"
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "documentId": {
+          "__rl": true,
+          "value": "1jlVeFyQe5wTgI6ClWftnt6NPzrOox30MFll4U1tE4wU",
+          "mode": "list",
+          "cachedResultName": "Copy of ABC Cabinet Production Data",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1jlVeFyQe5wTgI6ClWftnt6NPzrOox30MFll4U1tE4wU/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 341522900,
+          "mode": "list",
+          "cachedResultName": "Escalations",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1jlVeFyQe5wTgI6ClWftnt6NPzrOox30MFll4U1tE4wU/edit#gid=341522900"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Reason": "={{ $json.reason }}",
+            "Panel Code": "={{ $json['Panel Code'] }}",
+            "Workstation": "={{ $json['Workstation Id'] }}",
+            "Timestamp": "={{ $now }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "Timestamp",
+              "displayName": "Timestamp",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Panel Code",
+              "displayName": "Panel Code",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Workstation",
+              "displayName": "Workstation",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Reason",
+              "displayName": "Reason",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Status",
+              "displayName": "Status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "row_number",
+              "displayName": "row_number",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true,
+              "readOnly": true,
+              "removed": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        96,
+        -96
+      ],
+      "id": "28ef3f4f-711e-478d-9778-ac744139599d",
+      "name": "Update row in sheet",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "B9kLWCRiWs0ouamt",
+          "name": "Google Sheets account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "When Executed by Another Workflow": {
+      "main": [
+        [
+          {
+            "node": "Update row in sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "f1347750-0078-42bb-bccc-ea6b3a20c6b8",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "fc83b405efa60acbfa280b1c9905f167d082e0ac08dbca43c68e3200d62fce33"
+  },
+  "nodeGroups": [],
+  "id": "sRZ09AmFjo8vuNsh",
+  "tags": []
+}

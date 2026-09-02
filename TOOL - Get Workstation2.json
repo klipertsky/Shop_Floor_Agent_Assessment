@@ -1,0 +1,64 @@
+{
+  "name": "TOOL - Get Workstation2",
+  "nodes": [
+    {
+      "parameters": {
+        "workflowInputs": {
+          "values": [
+            {
+              "name": "Workstation Id"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        -400,
+        -160
+      ],
+      "id": "398fc1d0-338a-40da-8991-8ffcddd3c28f",
+      "name": "When Executed by Another Workflow"
+    },
+    {
+      "parameters": {
+        "jsCode": "const workstations = {\n  \"EDGE-01\": {\n    id: \"EDGE-01\",\n    name: \"Edge Banding\",\n    accepted_operations: [\"Edge Banding\"]\n  },\n\n  \"DRILL-01\": {\n    id: \"DRILL-01\",\n    name: \"Drilling\",\n    accepted_operations: [\"Drilling\"]\n  }\n};\n\nconst id = $json.workstation_id;\nconst workstation = workstations[id];\n\nif (!workstation) {\n  return [{\n    json: {\n      found: false,\n      workstation_id: id,\n      source: \"Workstation Database\"\n    }\n  }];\n}\n\nreturn [{\n  json: {\n    found: true,\n    workstation,\n    source: `Workstation ${id}`\n  }\n}];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -112,
+        -176
+      ],
+      "id": "7849794f-9bea-4c4c-b849-fe14e1ddc0e8",
+      "name": "Code in JavaScript"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "When Executed by Another Workflow": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "dcb90f88-da75-4f38-b073-c6c7c7046b35",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "fc83b405efa60acbfa280b1c9905f167d082e0ac08dbca43c68e3200d62fce33"
+  },
+  "nodeGroups": [],
+  "id": "WWK2Pgeuh2HDEhVv",
+  "tags": []
+}

@@ -1,0 +1,530 @@
+{
+  "name": "Shop_Floor_Agent_Assessment",
+  "nodes": [
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "You are the Shop-Floor AI Agent for ABC Cabinet.\n\nYour job is to help shop-floor operators identify panels, verify workstation compatibility, retrieve relevant SOP information, answer questions using only grounded data, record events, and escalate unsafe or unresolved situations.\n\nYou are an operational assistant, NOT a source of production facts.\n\nCRITICAL RULES:\n\n1. NEVER invent panel information.\n2. NEVER invent dimensions, material, cabinet ID, required operation, workstation requirements, machine settings, spindle speeds, feed rates, tooling parameters, safety procedures, or other production facts.\n3. Production facts MUST come from the available tools.\n4. SOP instructions MUST come from the search_sop tool.\n5. If required information is unavailable, explicitly state that the information is unavailable.\n6. When information is missing, conflicting, unsafe, or cannot be verified, recommend supervisor escalation.\n7. NEVER guess in order to provide an answer.\n8. Do not expose private reasoning or chain-of-thought. Only provide a concise execution trace containing tool names, inputs, success/failure, and sources.\n9. Use the minimum number of tools necessary, but use multiple tools when required to make a safe decision.\n10. You are allowed to call tools in sequence. A decision may require more than one tool call.\n11. Always verify the panel before giving panel-specific instructions.\n12. When a workstation is provided, verify the workstation requirements before deciding whether the panel belongs there.\n13. When instructions are requested, retrieve the relevant SOP before providing instructions.\n14. If the panel's required operation does not match the selected workstation, DO NOT instruct the operator to process the panel.\n15. For a workstation mismatch, tell the operator not to process the panel and identify the correct operation/workstation when that information is available.\n16. If the panel code does not exist, return \"Panel Not Found\" and do not fabricate panel information.\n17. If the user asks a question that is not supported by the available SOP or structured data, do not answer from general knowledge. Return an unsupported-information response and recommend escalation when appropriate.\n18. If the operator reports that a physical label does not match system information, treat this as a safety/verification issue and use escalate_to_supervisor.\n19. Record meaningful actions using record_event, especially panel scans, workstation mismatches, unsupported questions, and escalations.\n20. Tool results are authoritative over your own assumptions.\n\nAVAILABLE TOOLS:\n\nget_panel(panel_code)\n\n* Retrieves structured panel information.\n* Use this whenever a panel code is provided or when panel information is required.\n\nget_workstation_requirements(workstation_id)\n\n* Retrieves structured workstation information and accepted operations.\n* Use this when a workstation is provided or workstation compatibility must be checked.\n\nsearch_sop(query)\n\n* Searches the available SOP content.\n* Use this when the operator asks how to perform an operation, asks about an SOP, or requests production instructions.\n\nrecord_event(event)\n\n* Records an operational event for history and auditing.\n* Use it after meaningful decisions, scans, mismatches, unsupported requests, and escalations.\n\nescalate_to_supervisor(reason)\n\n* Creates or simulates a supervisor escalation.\n* Use this when information is conflicting, missing in a safety-relevant situation, or the operator reports a physical/system mismatch.\n\nDECISION PROCESS:\n\nFor a panel scan:\n\n1. Determine whether a panel code exists.\n2. Call get_panel.\n3. If the panel is not found:\n\n   * Do not invent information.\n   * Return Panel Not Found.\n   * Record the failed lookup.\n4. If a workstation is provided:\n\n   * Call get_workstation_requirements.\n   * Compare the panel's required_operation with the workstation's accepted operations.\n5. If the operation matches:\n\n   * Search the relevant SOP.\n   * Provide grounded instructions based only on the returned SOP.\n6. If the operation does not match:\n\n   * Do not allow processing at the selected workstation.\n   * Identify the correct operation/workstation if available.\n   * Record the mismatch.\n7. If information conflicts or cannot safely be resolved:\n\n   * Escalate to supervisor.\n8. Record the meaningful event.\n9. Return the structured result.\n\nFor questions:\n\n1. Determine what information is required.\n2. Use the appropriate tool(s).\n3. If the answer is supported by structured data or SOP content, answer it.\n4. If it is not supported, do not guess.\n5. If appropriate, escalate to supervisor.\n6. Record the event.\n\nSAFETY PRIORITY:\n\nSafety and data integrity are more important than answering the operator's question.\n\nIf you cannot verify something from the tools, say:\n\n\"That information is not available in the current panel/SOP data, so I won't guess. Please verify with a supervisor.\"\n\nWORKSTATION MISMATCH RESPONSE:\n\nIf a panel requires Drilling but the selected workstation is Edge Banding, the operator must NOT process the panel at Edge Banding.\n\nReturn a clear message such as:\n\n\"Do not process this panel at the selected workstation. The panel requires Drilling, while this workstation is configured for Edge Banding. Move the panel to the appropriate workstation or verify with a supervisor.\"\n\nUNKNOWN PANEL RESPONSE:\n\nIf get_panel returns found=false:\n\n\"Panel Not Found. I could not find panel [panel_code] in the production data. No panel information has been inferred.\"\n\nUNSUPPORTED QUESTION RESPONSE:\n\nIf the requested information is not contained in the available structured data or SOP:\n\n\"I don't have verified information for that question in the current production/SOP data, so I won't guess. Please verify with a supervisor.\"\n\nTOOL TRACE:\n\nReturn only a concise trace, for example:\n\n✓ get_panel(\"P-1001\") — success — Source: Panel P-1001\n✓ get_workstation_requirements(\"EDGE-01\") — success — Source: Workstation EDGE-01\n✓ search_sop(\"edge banding\") — success — Source: SOP - Edge Banding\n✓ record_event(...) — success\n\nNever expose hidden reasoning or chain-of-thought.\n\nYour final answer must follow the required structured output schema.\n",
+        "hasOutputParser": true,
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        -560,
+        -528
+      ],
+      "id": "67cce39c-3af3-4ceb-a705-c48806e3404d",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "description": "Retrieves the requirements and capabilities of a specific shop-floor workstation. Use this tool to verify whether a panel's required operation is compatible with the selected workstation before providing processing instructions. Returns the workstation ID, name, accepted operations, and source information.",
+        "workflowId": {
+          "__rl": true,
+          "value": "WWK2Pgeuh2HDEhVv",
+          "mode": "list",
+          "cachedResultUrl": "/workflow/WWK2Pgeuh2HDEhVv",
+          "cachedResultName": "TOOL - Get Workstation2"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Workstation Id": "={{ $json['WorkStation Id'] }}"
+          },
+          "matchingColumns": [
+            "Workstation Id"
+          ],
+          "schema": [
+            {
+              "id": "Workstation Id",
+              "displayName": "Workstation Id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string"
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.toolWorkflow",
+      "typeVersion": 2.2,
+      "position": [
+        -528,
+        -176
+      ],
+      "id": "f74ebfec-0917-4c58-95a9-b507ac49d9d7",
+      "name": "Get Workstation"
+    },
+    {
+      "parameters": {
+        "description": "Records important shop-floor events for history and traceability, such as panel scans, workstation mismatches, unsupported questions, successful validations, errors, and supervisor escalations. Use this tool after a meaningful action or decision. Include the event type, panel code, workstation ID, status, message, and relevant source information.",
+        "workflowId": {
+          "__rl": true,
+          "value": "Uq0qz1pjYQr4DNtF",
+          "mode": "list",
+          "cachedResultUrl": "/workflow/Uq0qz1pjYQr4DNtF",
+          "cachedResultName": "TOOL - Record Event2"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Panel Code": "={{ $json['Panel Code'] }}",
+            "Workstation Id": "={{ $json['WorkStation Id'] }}",
+            "Event Type": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Event_Type', ``, 'string') }}",
+            "Details": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Details', ``, 'string') }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "Event Type",
+              "displayName": "Event Type",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string"
+            },
+            {
+              "id": "Panel Code",
+              "displayName": "Panel Code",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string"
+            },
+            {
+              "id": "Workstation Id",
+              "displayName": "Workstation Id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string"
+            },
+            {
+              "id": "Details",
+              "displayName": "Details",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string"
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.toolWorkflow",
+      "typeVersion": 2.2,
+      "position": [
+        -320,
+        -176
+      ],
+      "id": "dd2b79a3-429b-440c-8185-2a4f363e3196",
+      "name": "Record Event"
+    },
+    {
+      "parameters": {
+        "description": "Creates a supervisor escalation when a shop-floor issue cannot be safely resolved using the available panel data or SOPs. Use this tool when information is missing or conflicting, a physical panel label does not match system information, an unsupported production question requires verification, or another safety-critical issue requires human review. Include the reason, panel code, workstation ID, and relevant details.",
+        "workflowId": {
+          "__rl": true,
+          "value": "sRZ09AmFjo8vuNsh",
+          "mode": "list",
+          "cachedResultUrl": "/workflow/sRZ09AmFjo8vuNsh",
+          "cachedResultName": "TOOL - Escalate Supervisor2"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Panel Code": "={{ $json['Panel Code'] }}",
+            "Workstation Id": "={{ $json['WorkStation Id'] }}",
+            "reason": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('reason', ``, 'string') }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "reason",
+              "displayName": "reason",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string"
+            },
+            {
+              "id": "Panel Code",
+              "displayName": "Panel Code",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string"
+            },
+            {
+              "id": "Workstation Id",
+              "displayName": "Workstation Id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string"
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.toolWorkflow",
+      "typeVersion": 2.2,
+      "position": [
+        -208,
+        -176
+      ],
+      "id": "4792c75f-dafa-4040-9a69-8ce8d079590f",
+      "name": "Escalate Supervisor"
+    },
+    {
+      "parameters": {
+        "formTitle": "ABC FORM",
+        "formFields": {
+          "values": [
+            {
+              "fieldLabel": "Panel Code"
+            },
+            {
+              "fieldLabel": "WorkStation Id",
+              "fieldType": "dropdown",
+              "fieldOptions": {
+                "values": [
+                  {
+                    "option": "EDGE-01"
+                  },
+                  {
+                    "option": "DRILL-01"
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.formTrigger",
+      "typeVersion": 2.6,
+      "position": [
+        -944,
+        -528
+      ],
+      "id": "7f017dec-4258-407d-b917-2b233e7ddfc2",
+      "name": "On form submission",
+      "webhookId": "d6485ee0-3779-4d0b-bc45-7e2ef7bdd0ae"
+    },
+    {
+      "parameters": {
+        "description": "Searches the approved Standard Operating Procedures (SOPs) for information relevant to the operator's question or the panel's required operation. Use this tool to retrieve verified workstation procedures and instructions. Only provide instructions supported by the returned SOP content. If no relevant SOP information is found, do not guess or invent instructions; indicate that the information is unavailable and recommend supervisor verification.",
+        "workflowId": {
+          "__rl": true,
+          "value": "dsdB2zu2wgTGEJy8",
+          "mode": "list",
+          "cachedResultUrl": "/workflow/dsdB2zu2wgTGEJy8",
+          "cachedResultName": "TOOL - Search SOP2"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "SOP Id": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('SOP_Id', ``, 'string') }}"
+          },
+          "matchingColumns": [
+            "SOP Id"
+          ],
+          "schema": [
+            {
+              "id": "SOP Id",
+              "displayName": "SOP Id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string"
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.toolWorkflow",
+      "typeVersion": 2.2,
+      "position": [
+        -416,
+        -176
+      ],
+      "id": "298cedff-220e-4cf2-83c4-2eb6a3eebbd0",
+      "name": "SOP tool"
+    },
+    {
+      "parameters": {
+        "select": "channel",
+        "channelId": {
+          "__rl": true,
+          "value": "C0BTMRWRCG1",
+          "mode": "list",
+          "cachedResultName": "jobs"
+        },
+        "text": "={{ $json.output }}",
+        "otherOptions": {}
+      },
+      "type": "n8n-nodes-base.slack",
+      "typeVersion": 2.7,
+      "position": [
+        -144,
+        -528
+      ],
+      "id": "7efadbb9-f07f-40d0-a513-d658083d0622",
+      "name": "Send a message",
+      "webhookId": "276d6636-f12f-4d6a-99ad-c12348bdb49f",
+      "credentials": {
+        "slackApi": {
+          "id": "1748H88n5qkHfKWy",
+          "name": "Slack account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sessionIdType": "customKey",
+        "sessionKey": "1"
+      },
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.4,
+      "position": [
+        -720,
+        -320
+      ],
+      "id": "ab872450-e476-4773-9802-14994bb86de7",
+      "name": "Simple Memory"
+    },
+    {
+      "parameters": {
+        "jsonSchemaExample": "{\n  \"type\": \"object\",\n  \"properties\": {\n    \"status\": {\n      \"type\": \"string\",\n      \"enum\": [\n        \"APPROVED\",\n        \"WRONG_WORKSTATION\",\n        \"PANEL_NOT_FOUND\",\n        \"UNSUPPORTED\",\n        \"ESCALATED\",\n        \"ERROR\"\n      ]\n    },\n    \"message\": {\n      \"type\": \"string\"\n    },\n    \"panel\": {\n      \"type\": [\"object\", \"null\"],\n      \"properties\": {\n        \"panel_code\": {\n          \"type\": \"string\"\n        },\n        \"cabinet_id\": {\n          \"type\": \"string\"\n        },\n        \"panel_name\": {\n          \"type\": \"string\"\n        },\n        \"dimensions\": {\n          \"type\": \"object\",\n          \"properties\": {\n            \"length_mm\": {\n              \"type\": \"number\"\n            },\n            \"width_mm\": {\n              \"type\": \"number\"\n            },\n            \"thickness_mm\": {\n              \"type\": \"number\"\n            }\n          }\n        },\n        \"material\": {\n          \"type\": \"string\"\n        },\n        \"required_operation\": {\n          \"type\": \"string\"\n        }\n      }\n    },\n    \"workstation\": {\n      \"type\": [\"object\", \"null\"],\n      \"properties\": {\n        \"id\": {\n          \"type\": \"string\"\n        },\n        \"name\": {\n          \"type\": \"string\"\n        },\n        \"compatible\": {\n          \"type\": \"boolean\"\n        }\n      }\n    },\n    \"instructions\": {\n      \"type\": \"array\",\n      \"items\": {\n        \"type\": \"string\"\n      }\n    },\n    \"next_action\": {\n      \"type\": \"string\"\n    },\n    \"escalation\": {\n      \"type\": [\"object\", \"null\"],\n      \"properties\": {\n        \"required\": {\n          \"type\": \"boolean\"\n        },\n        \"reason\": {\n          \"type\": \"string\"\n        },\n        \"ticket_id\": {\n          \"type\": [\"string\", \"null\"]\n        }\n      }\n    },\n    \"sources\": {\n      \"type\": \"array\",\n      \"items\": {\n        \"type\": \"string\"\n      }\n    },\n    \"tool_trace\": {\n      \"type\": \"array\",\n      \"items\": {\n        \"type\": \"object\",\n        \"properties\": {\n          \"tool\": {\n            \"type\": \"string\"\n          },\n          \"input\": {\n            \"type\": \"string\"\n          },\n          \"status\": {\n            \"type\": \"string\"\n          },\n          \"source\": {\n            \"type\": \"string\"\n          }\n        },\n        \"required\": [\n          \"tool\",\n          \"input\",\n          \"status\",\n          \"source\"\n        ]\n      }\n    }\n  },\n  \"required\": [\n    \"status\",\n    \"message\",\n    \"panel\",\n    \"workstation\",\n    \"instructions\",\n    \"next_action\",\n    \"escalation\",\n    \"sources\",\n    \"tool_trace\"\n  ]\n}"
+      },
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "typeVersion": 1.3,
+      "position": [
+        -176,
+        -320
+      ],
+      "id": "d4e8f606-edd2-4069-aa11-37f799293296",
+      "name": "Structured Output Parser"
+    },
+    {
+      "parameters": {
+        "options": {
+          "maxOutputTokens": 2048
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1.1,
+      "position": [
+        -832,
+        -320
+      ],
+      "id": "949313b0-9056-40c9-ac49-efbd361419c9",
+      "name": "LLM",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "fg5ajqt2qUj0dp3o",
+          "name": "biyaya"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "description": "Use this tool to retrieve panel information for a specific panel code. Always use this tool when the operator provides a panel code or asks about a specific panel. Pass the panel code exactly as provided by the operator.",
+        "workflowId": {
+          "__rl": true,
+          "value": "98J5HKfYteovh3Pi",
+          "mode": "list",
+          "cachedResultUrl": "/workflow/98J5HKfYteovh3Pi",
+          "cachedResultName": "TOOL - get_panel2"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "panel_code": "={{ $json['Panel Code'] }}"
+          },
+          "matchingColumns": [
+            "panel_code"
+          ],
+          "schema": [
+            {
+              "id": "panel_code",
+              "displayName": "panel_code",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.toolWorkflow",
+      "typeVersion": 2.2,
+      "position": [
+        -640,
+        -176
+      ],
+      "id": "bccddaa6-57f5-43d7-b518-71ff06d2faf0",
+      "name": "Call 'TOOL - get_panel2'"
+    }
+  ],
+  "pinData": {
+    "On form submission": [
+      {
+        "json": {
+          "Panel Code": "P-1001",
+          "WorkStation Id": "DRILL-01",
+          "submittedAt": "2026-09-02T11:36:23.758-04:00",
+          "formMode": "test"
+        },
+        "pairedItem": {
+          "item": 0
+        }
+      }
+    ]
+  },
+  "connections": {
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "Send a message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Workstation": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Record Event": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Escalate Supervisor": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "On form submission": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "SOP tool": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Simple Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Structured Output Parser": {
+      "ai_outputParser": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_outputParser",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "LLM": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Call 'TOOL - get_panel2'": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "cd75ab5f-10cd-4695-9f6e-30f25544ad83",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "fc83b405efa60acbfa280b1c9905f167d082e0ac08dbca43c68e3200d62fce33"
+  },
+  "nodeGroups": [],
+  "id": "7IygMRpKFGYR5TGl",
+  "tags": []
+}
