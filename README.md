@@ -537,12 +537,6 @@ If more development time were available, possible improvements would include:
 
 ---
 
-## ⏱️ Development Time
-
-**Estimated development time:** [Add your actual time here]
-
----
-
 ##
 
 ## 👨‍💻 Author
