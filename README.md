@@ -30,12 +30,17 @@ Operator Input → Agent Decides → Calls Tool(s) → Reads Result → Decides 
 
 **Stack:** n8n (AI Agent node, Tools Agent mode) · Google Gemini (chat model) · n8n Data Tables (structured mock data) · Structured Output Parser
 
+Each tool is built as its **own standalone sub-workflow** (e.g. `TOOL - get_panel`, `TOOL - Get Workstation`, `TOOL - Search SOP`, `TOOL - Record Event`, `TOOL - Escalate Supervisor`), each backed by its own dedicated Data Table, and called from the main `ABC cabinet` workflow via the Tool Workflow connector on the AI Agent node. This keeps each tool independently testable and reusable outside the main flow.
+
 ```
+Main workflow: "ABC cabinet"
+
 [Form Trigger: workstation, panel code, question]
                     ↓
              [AI Agent (Gemini)]
-   ┌──────────┬──────────────┬──────────┬─────────────┬──────────────────────┐
-get_panel  get_workstation_requirements search_sop  record_event   escalate_to_supervisor
+   ┌────────────┬──────────────────────┬──────────────┬──────────────────┬───────────────────────────┐
+TOOL - get_panel TOOL - Get Workstation TOOL - Search SOP TOOL - Record Event TOOL - Escalate Supervisor
+(each a sub-workflow → own Data Table)
                     ↓
         [Structured Output Parser]
                     ↓
@@ -92,17 +97,15 @@ Every agent response is returned as structured JSON via a Structured Output Pars
 
 ## 🧩 Data Model (n8n Data Tables)
 
-**`panels`**
-`panel_code · cabinet_id · panel_name · width_mm · height_mm · thickness_mm · material · required_operation`
+Each tool has its own dedicated Data Table:
 
-**`workstations`**
-`workstation_name · workstation_id · supported_operations`
-
-**`sops`**
-`workstation · topic · instructions`
-
-**`event_log`**
-`timestamp · event_type · panel_code · workstation · details · result`
+| Table | Columns | Used by |
+|---|---|---|
+| `get_panel` | 9 columns — panel_code, cabinet_id, panel_name, width_mm, height_mm, thickness_mm, material, required_operation, + metadata | `get_panel` tool |
+| `get_workstation_requirements` | 5 columns — workstation_name, workstation_id, supported_operations, + metadata | `get_workstation_requirements` tool |
+| `search_sop` | 4 columns — workstation, topic, instructions, + metadata | `search_sop` tool |
+| `record_event` | 7 columns — timestamp, event_type, panel_code, workstation, details, result, + metadata | `record_event` tool |
+| `escalate_to_supervisor` | 7 columns — timestamp, reason, panel_code, workstation, details, status, + metadata | `escalate_to_supervisor` tool |
 
 ---
 
@@ -130,10 +133,37 @@ Per assessment scope — kept deliberately simple:
 
 ## 📦 Running This Project
 
-1. Import the workflow JSON into a self-hosted or cloud n8n instance.
-2. Set up 4 n8n Data Tables (`panels`, `workstations`, `sops`, `event_log`) using the schema above and seed with mock data.
-3. Add a Google Gemini credential (free tier via [Google AI Studio](https://aistudio.google.com)) and connect it to the AI Agent's Chat Model input.
-4. Open the Form Trigger's production URL to use the app.
+> **Note:** n8n's workflow export only includes workflow structure (nodes, connections, parameters) — it does **not** include Data Table contents. Workflows and Data Tables are exported/imported separately.
+
+**1. Import the workflows** — this project is 6 separate n8n workflows:
+   - `ABC cabinet` — the main workflow (Form Trigger → AI Agent → response branches)
+   - `TOOL - get_panel`
+   - `TOOL - Get Workstation`
+   - `TOOL - Search SOP`
+   - `TOOL - Record Event`
+   - `TOOL - Escalate Supervisor`
+
+   Import all 6 into your n8n instance, then re-link each Tool Workflow node in the `ABC cabinet` workflow's AI Agent to the corresponding imported sub-workflow (n8n references sub-workflows by ID, so this link needs to be reconnected after import).
+
+**2. Create 5 Data Tables** with these exact names so each tool's node resolves correctly:
+   - `get_panel` (9 columns)
+   - `get_workstation_requirements` (5 columns)
+   - `search_sop` (4 columns)
+   - `record_event` (7 columns)
+   - `escalate_to_supervisor` (7 columns)
+
+   See the [Data Model](#-data-model-n8n-data-tables) section above for column details.
+
+**3. Seed the reference tables** using the corresponding files in `/data`:
+   - `data/get_panel.json`
+   - `data/get_workstation_requirements.json`
+   - `data/search_sop.json`
+
+   `record_event` and `escalate_to_supervisor` don't need seeding — they populate at runtime as the agent logs scans, questions, and escalations.
+
+**4. Add a Google Gemini credential** (free tier via [Google AI Studio](https://aistudio.google.com)) and connect it to the AI Agent's Chat Model input in the `ABC cabinet` workflow.
+
+**5. Open the Form Trigger's production URL** to use the app.
 
 ---
 
