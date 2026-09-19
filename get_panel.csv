@@ -1,0 +1,6 @@
+﻿id,panel_code,cabinet_id,panel_name,width_mm,height_mm,thickness_mm,material,required_operation,createdAt,updatedAt
+1,P-1001,CAB-001,Left Side Panel,600,720,18,melamine,Edge banding,2026-09-17T07:15:18.984Z,2026-09-17T07:16:30.966Z
+2,P-1002,CAB-001,Right Side Panel,600,720,18,melamine,Edge banding,2026-09-17T07:16:40.512Z,2026-09-17T07:17:31.969Z
+3,P-1003,CAB-002,Door Panel,450,700,18,MDF,Drilling,2026-09-17T07:18:18.115Z,2026-09-17T07:19:17.449Z
+4,P-1004,CAB-002,Drawer Front,500,180,18,MDF,Drilling,2026-09-17T07:19:18.843Z,2026-09-17T07:20:15.231Z
+5,P-1005,CAB-003,Top Panel,800,600,18,Plywood,Edge Banding,2026-09-17T07:20:24.842Z,2026-09-17T07:21:15.129Z

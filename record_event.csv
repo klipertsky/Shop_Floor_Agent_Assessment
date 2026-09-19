@@ -1,0 +1,4 @@
+﻿id,Timestamp,Event_type,Panel_code,Workstation_id,Question,Details,createdAt,updatedAt
+21,2026-09-18 08:38,Escalation,P-1006,DRILL-01,what spindle speed should I use?,"Panel P-1006 not found, spindle speed inquiry not covered in SOP, escalated to supervisor.",2026-09-19T00:38:34.829Z,2026-09-19T00:38:34.829Z
+22,2026-09-18 08:48,Scan/Query Success,abcded,EDGE-01,how to use edge banding?,Operator verified panel abcded at EDGE-01 for Edge Banding. SOP provided.,2026-09-19T00:48:20.770Z,2026-09-19T00:48:20.770Z
+23,2026-09-18 08:56,Not Found,abcded,EDGE-01,how to use edge banding?,Panel abcded not found.,2026-09-19T00:56:34.907Z,2026-09-19T00:56:34.907Z

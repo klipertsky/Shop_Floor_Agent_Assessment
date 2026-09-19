@@ -1,0 +1,71 @@
+{
+  "name": "TOOL - Get Workstation",
+  "nodes": [
+    {
+      "parameters": {
+        "workflowInputs": {
+          "values": [
+            {
+              "name": "Workstation Id"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        -400,
+        -160
+      ],
+      "id": "0f121037-c8f8-4aef-9d1e-8a28dbc4d977",
+      "name": "When Executed by Another Workflow"
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "dataTableId": {
+          "__rl": true,
+          "value": "R2rdyfabO8g7vOFi",
+          "mode": "list",
+          "cachedResultName": "get_workstation_requirements",
+          "cachedResultUrl": "/projects/uj4AnkBX35xmsLWQ/datatables/R2rdyfabO8g7vOFi"
+        }
+      },
+      "type": "n8n-nodes-base.dataTable",
+      "typeVersion": 1.1,
+      "position": [
+        -176,
+        -160
+      ],
+      "id": "78363fb1-c299-4077-9548-9e22c00a83ff",
+      "name": "Get row(s)"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "When Executed by Another Workflow": {
+      "main": [
+        [
+          {
+            "node": "Get row(s)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "d33f65b6-b2c2-49cd-809f-5f70ebf7039a",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "fc83b405efa60acbfa280b1c9905f167d082e0ac08dbca43c68e3200d62fce33"
+  },
+  "nodeGroups": [],
+  "id": "oEkU64r2ccHIZCAc",
+  "tags": []
+}

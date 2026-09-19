@@ -1,0 +1,77 @@
+{
+  "name": "TOOL - Escalate Supervisor",
+  "nodes": [
+    {
+      "parameters": {
+        "workflowInputs": {
+          "values": [
+            {
+              "name": "reason"
+            },
+            {
+              "name": "Panel Code"
+            },
+            {
+              "name": "Workstation Id"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        -128,
+        -96
+      ],
+      "id": "cf59b6a7-4121-4038-b0a8-191aaea61e6e",
+      "name": "When Executed by Another Workflow"
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "dataTableId": {
+          "__rl": true,
+          "value": "EgTjXHY8uhHoH6kG",
+          "mode": "list",
+          "cachedResultName": "escalate_to_supervisor",
+          "cachedResultUrl": "/projects/uj4AnkBX35xmsLWQ/datatables/EgTjXHY8uhHoH6kG"
+        }
+      },
+      "type": "n8n-nodes-base.dataTable",
+      "typeVersion": 1.1,
+      "position": [
+        96,
+        -96
+      ],
+      "id": "5677d60c-ac39-41b5-83d4-cb764832678f",
+      "name": "Get row(s)"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "When Executed by Another Workflow": {
+      "main": [
+        [
+          {
+            "node": "Get row(s)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "2ff5befa-673d-45a8-9a97-2d9e558f6a7c",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "fc83b405efa60acbfa280b1c9905f167d082e0ac08dbca43c68e3200d62fce33"
+  },
+  "nodeGroups": [],
+  "id": "HBiG9OUS5qXYxcoR",
+  "tags": []
+}

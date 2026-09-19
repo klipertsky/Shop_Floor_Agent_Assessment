@@ -1,0 +1,586 @@
+{
+  "name": "ABC cabinet",
+  "nodes": [
+    {
+      "parameters": {
+        "modelName": "models/gemini-3.1-flash-lite",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1.1,
+      "position": [
+        -1792,
+        -1696
+      ],
+      "id": "c670ea81-e8a9-4950-92c0-32a530c41344",
+      "name": "Google Gemini Chat Model",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "fg5ajqt2qUj0dp3o",
+          "name": "biyaya"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "formTitle": "ABC FORM",
+        "formFields": {
+          "values": [
+            {
+              "fieldLabel": "Panel Code"
+            },
+            {
+              "fieldLabel": "WorkStation Id",
+              "fieldType": "dropdown",
+              "fieldOptions": {
+                "values": [
+                  {
+                    "option": "EDGE-01"
+                  },
+                  {
+                    "option": "DRILL-01"
+                  }
+                ]
+              }
+            },
+            {
+              "fieldLabel": "Question about Workstation?",
+              "fieldType": "textarea"
+            }
+          ]
+        },
+        "responseMode": "lastNode",
+        "options": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.formTrigger",
+      "typeVersion": 2.6,
+      "position": [
+        -1920,
+        -1984
+      ],
+      "id": "1dab85f1-1017-471b-88a9-2340028e277f",
+      "name": "On form submission",
+      "webhookId": "c04172f9-f27e-48d0-a4cf-9a6a232cf32e"
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "dataTableId": {
+          "__rl": true,
+          "value": "nBuHqMViqTGyNyit",
+          "mode": "list",
+          "cachedResultName": "get_panel",
+          "cachedResultUrl": "/projects/uj4AnkBX35xmsLWQ/datatables/nBuHqMViqTGyNyit"
+        },
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "panel_code",
+              "keyValue": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('conditions0_Value', ``, 'string') }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.dataTableTool",
+      "typeVersion": 1.1,
+      "position": [
+        -1568,
+        -1696
+      ],
+      "id": "c1f14547-951d-4a18-8626-6d42fcaab754",
+      "name": "get_panel"
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "dataTableId": {
+          "__rl": true,
+          "value": "R2rdyfabO8g7vOFi",
+          "mode": "list",
+          "cachedResultName": "get_workstation_requirements",
+          "cachedResultUrl": "/projects/uj4AnkBX35xmsLWQ/datatables/R2rdyfabO8g7vOFi"
+        },
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "WorkStation_Id",
+              "keyValue": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('conditions0_Value', ``, 'string') }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.dataTableTool",
+      "typeVersion": 1.1,
+      "position": [
+        -1424,
+        -1696
+      ],
+      "id": "0315b96e-8987-4c41-8d9f-5c56d27144e2",
+      "name": "get_workstation_requirements"
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "dataTableId": {
+          "__rl": true,
+          "value": "1OgmUKJ1XaM0bYhj",
+          "mode": "list",
+          "cachedResultName": "search_sop",
+          "cachedResultUrl": "/projects/uj4AnkBX35xmsLWQ/datatables/1OgmUKJ1XaM0bYhj"
+        },
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "instruction",
+              "condition": "ilike",
+              "keyValue": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('conditions0_Value', ``, 'string') }}"
+            },
+            {
+              "keyName": "operation",
+              "condition": "ilike",
+              "keyValue": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('conditions1_Value', ``, 'string') }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.dataTableTool",
+      "typeVersion": 1.1,
+      "position": [
+        -1280,
+        -1696
+      ],
+      "id": "84f43014-bd93-4ede-83d3-c75c571e09af",
+      "name": "search_sop"
+    },
+    {
+      "parameters": {
+        "dataTableId": {
+          "__rl": true,
+          "value": "lsQ281Qz4FqAllMB",
+          "mode": "list",
+          "cachedResultName": "record_event",
+          "cachedResultUrl": "/projects/uj4AnkBX35xmsLWQ/datatables/lsQ281Qz4FqAllMB"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Panel_code": "={{ $json['Panel Code'] }}",
+            "Workstation_id": "={{ $json['WorkStation Id'] }}",
+            "Question": "={{ $json['Question about Workstation?'] }}",
+            "Event_type": "={{ $fromAI('Event_type', ``, 'string') }}",
+            "Timestamp": "={{ $now.format('yyyy-MM-dd hh:mm') }}",
+            "Details": "={{ $fromAI('Details', ``, 'string') }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "Timestamp",
+              "displayName": "Timestamp",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Event_type",
+              "displayName": "Event_type",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Panel_code",
+              "displayName": "Panel_code",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Workstation_id",
+              "displayName": "Workstation_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Question",
+              "displayName": "Question",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Details",
+              "displayName": "Details",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.dataTableTool",
+      "typeVersion": 1.1,
+      "position": [
+        -1184,
+        -1696
+      ],
+      "id": "98f19109-0874-49f8-b307-ef0423dd5254",
+      "name": "record_event "
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "78b287fc-c282-44e1-bae3-0ead1e391df3",
+              "leftValue": "={{ $json.output.status }}",
+              "rightValue": "ok",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        -1232,
+        -1984
+      ],
+      "id": "db82e65a-6db4-4e15-83bd-ec7f13876b5e",
+      "name": "If1"
+    },
+    {
+      "parameters": {
+        "jsonSchemaExample": "  {\n  \"status\": \"ok | mismatch | not_found | escalated\",\n  \"message\": \"Human-readable message for the operator\",\n  \"panel_code\": \"{{ $json['Panel Code'] }}\",\n  \"workstation\": \"{{ $json['WorkStation Id'] }}\",\n  \"user query\": \"{{ $json['Question about Workstation?'] }}\",\n  \"source\": \"Panel P-1002; Workstation Requirements - EDGE-01, search_sop\",\n  \"escalated\": false,\n  \"event_logged\": true\n  }"
+      },
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "typeVersion": 1.3,
+      "position": [
+        -944,
+        -1696
+      ],
+      "id": "c26aaf64-3244-4f54-ac5b-a474d2ad5d39",
+      "name": "Structured Output Parser1"
+    },
+    {
+      "parameters": {
+        "dataTableId": {
+          "__rl": true,
+          "value": "EgTjXHY8uhHoH6kG",
+          "mode": "list",
+          "cachedResultName": "escalate_to_supervisor",
+          "cachedResultUrl": "/projects/uj4AnkBX35xmsLWQ/datatables/EgTjXHY8uhHoH6kG"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Timestamp": "={{ $now.format('yyyy-MM-dd hh:mm') }}",
+            "Panel_code": "={{ $json['Panel Code'] }}",
+            "Workstation": "={{ $json['WorkStation Id'] }}",
+            "Event_type": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Event_type', ``, 'string') }}",
+            "Status": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Status', ``, 'string') }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "Timestamp",
+              "displayName": "Timestamp",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Panel_code",
+              "displayName": "Panel_code",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Workstation",
+              "displayName": "Workstation",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Event_type",
+              "displayName": "Event_type",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Status",
+              "displayName": "Status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.dataTableTool",
+      "typeVersion": 1.1,
+      "position": [
+        -1072,
+        -1696
+      ],
+      "id": "09924447-0334-4231-b761-d98962f9a997",
+      "name": "escalate to supervisor"
+    },
+    {
+      "parameters": {
+        "operation": "completion",
+        "completionTitle": "Success",
+        "completionMessage": "=STATUS: {{ $json.output.status }}\n\nSystem Message:{{ $json.output.message }}\n\nPanel code: {{ $('Floor Agent AI').item.json.output.panel_code }}\nWorkstation: {{ $('Floor Agent AI').item.json.output.workstation }}\nUser Query: {{ $('Floor Agent AI').item.json.output['user query'] }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.form",
+      "typeVersion": 2.5,
+      "position": [
+        -736,
+        -2032
+      ],
+      "id": "6bd0964c-ffb5-4649-b630-3298c9586093",
+      "name": "Okay response",
+      "webhookId": "ef199428-2a80-44a7-aef7-07ac9bcca9dd"
+    },
+    {
+      "parameters": {
+        "operation": "completion",
+        "completionTitle": "Error",
+        "completionMessage": "=STATUS: {{ $json.output.status }}\n\nSystem Message:{{ $json.output.message }}\n\nPanel code: {{ $('Floor Agent AI').item.json.output.panel_code }}\nWorkstation: {{ $('Floor Agent AI').item.json.output.workstation }}\nUser Query: {{ $('Floor Agent AI').item.json.output['user query'] }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.form",
+      "typeVersion": 2.5,
+      "position": [
+        -736,
+        -1808
+      ],
+      "id": "3723690e-471b-4b53-8b72-06eece12a71b",
+      "name": "Error response",
+      "webhookId": "ef199428-2a80-44a7-aef7-07ac9bcca9dd"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json['Panel Code'] }}\n{{ $json['WorkStation Id'] }}\n{{ $json['Question about Workstation?'] }}",
+        "hasOutputParser": true,
+        "options": {
+          "systemMessage": "=You are a Shop-Floor AI Agent helping operators at ABC Cabinet identify panels, confirm they are at the correct workstation, and follow the correct SOP instructions.\n\nYou have access to the following tools. You must decide which tool(s) to call based on the operator's input — never skip straight to an answer without calling the relevant tool(s) first.\n\nTOOLS\n- get_panel(panel_code): Retrieves panel data (cabinet ID, name, dimensions, material, required operation). Call this whenever a panel code is provided, before saying anything about the panel.\n- get_workstation_requirements(workstation_name): Retrieves what operations a workstation supports. Call this to check whether a panel's required operation matches the selected workstation.\n- search_sop(query): Retrieves SOP instructions for a workstation or topic. Call this before giving any operational instructions or answering a process/procedure question.\n- record_event(event_type, panel_code, details): Logs the scan, question, or escalation to history. Call this after you reach a conclusion, whether success, mismatch, not-found, or escalation.\n- escalate_to_supervisor(reason, panel_code): Escalates to a supervisor. Call this whenever the issue cannot be safely resolved from available data.\n\nRULES\n\n1. Never state a panel's dimensions, material, cabinet ID, or required operation unless it came from get_panel. Never invent this data.\n\n2. Never give operational instructions, steps, settings, or safety procedures unless they came from search_sop. Never invent machine settings, speeds, tooling parameters, or safety procedures under any circumstance.\n\n3. Always check whether the panel's required operation matches the selected workstation using get_workstation_requirements before telling the operator to proceed.\n\n4. If get_panel returns no result, tell the operator \"Panel Not Found\" — do not guess or invent panel data. Then call record_event.\n\n5. If the panel's required operation does not match the selected workstation, tell the operator not to process the panel and state the correct workstation instead. Then call record_event.\n\n6. If a question is asked that is not covered by Tool search_sop or panel data (e.g. spindle speed, machine settings not in the operation or instruction), do not guess. Call escalate_to_supervisor and tell the operator you cannot answer this safely and a supervisor has been notified.\nIf search_sop returns no results, an empty result, or results that do not clearly address the operator's question, you must NOT attempt to answer from your own knowledge. Treat this as an unsupported question and call escalate_to_supervisor immediately.\n\n7. If there is a mismatch or conflict between what the operator describes and what the system data shows (e.g. physical label vs. system info), call escalate_to_supervisor — do not attempt to resolve it yourself.\n\n8. Always call record_event once you reach a conclusion (success, mismatch, not found, or escalation), so it appears in history.\n\n9. When giving grounded information, state the source, e.g. \"Source: Panel P-1001\" or \"Source: SOP - Edge Banding.\"\n\n10. Do not call the same tool with the same input more than once in a single conversation. Once you have the information you need from your tools, respond directly to the operator — do not keep calling tools after you have enough information to answer or escalate.\n\n11. Never reveal your internal reasoning or chain-of-thought. Only give the operator your final answer, the source, and (if relevant) confirmation that an event was logged or an escalation was triggered.\n\nAlways ground your response in tool output. If you are ever unsure whether you have enough verified information to answer safely, escalate rather than guess.\n\nCRITICAL: Call record_event only ONCE per conversation, after you have reached your final conclusion. Never call record_event more than once. If you have already called record_event, do not call it again — proceed directly to your final response.\n  \n  {\n  \"status\": \"ok | mismatch | not_found | escalated\",\n  \"message\": \"Human-readable message for the operator\",\n  \"panel_code\": \"{{ $json['Panel Code'] }}\",\n  \"workstation\": \"{{ $json['WorkStation Id'] }}\",\n  \"user query\": \"{{ $json['Question about Workstation?'] }}\",\n  \"source\": \"Panel P-1002; Workstation Requirements - EDGE-01, search_sop\",\n  \"escalated\": false,\n  \"event_logged\": true\n}"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        -1600,
+        -1984
+      ],
+      "id": "0063d309-b9de-4d8e-9781-003748b7e979",
+      "name": "Floor Agent AI",
+      "alwaysOutputData": false
+    }
+  ],
+  "pinData": {
+    "On form submission": [
+      {
+        "json": {
+          "Panel Code": "abcded",
+          "WorkStation Id": "EDGE-01",
+          "Question about Workstation?": "how to use edge banding?",
+          "submittedAt": "2026-09-18T20:48:08.865-04:00",
+          "formMode": "test"
+        },
+        "pairedItem": {
+          "item": 0
+        }
+      }
+    ]
+  },
+  "connections": {
+    "Google Gemini Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Floor Agent AI",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "On form submission": {
+      "main": [
+        [
+          {
+            "node": "Floor Agent AI",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "get_panel": {
+      "ai_tool": [
+        [
+          {
+            "node": "Floor Agent AI",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "get_workstation_requirements": {
+      "ai_tool": [
+        [
+          {
+            "node": "Floor Agent AI",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "search_sop": {
+      "ai_tool": [
+        [
+          {
+            "node": "Floor Agent AI",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "record_event ": {
+      "ai_tool": [
+        [
+          {
+            "node": "Floor Agent AI",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If1": {
+      "main": [
+        [
+          {
+            "node": "Okay response",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Error response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Structured Output Parser1": {
+      "ai_outputParser": [
+        [
+          {
+            "node": "Floor Agent AI",
+            "type": "ai_outputParser",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "escalate to supervisor": {
+      "ai_tool": [
+        [
+          {
+            "node": "Floor Agent AI",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Floor Agent AI": {
+      "main": [
+        [
+          {
+            "node": "If1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "de583a99-4a53-4436-9f60-70e051675a53",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "fc83b405efa60acbfa280b1c9905f167d082e0ac08dbca43c68e3200d62fce33"
+  },
+  "nodeGroups": [],
+  "id": "8odLrU2X3ChBJvxr",
+  "tags": []
+}
